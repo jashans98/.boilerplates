@@ -1,0 +1,34 @@
+#!/usr/bin/env python
+import sys, os
+import subprocess
+import json
+
+HOME = os.getenv('HOME')
+TEMPLATES_DIR = '{0}/.templates'.format(HOME)
+
+def create_template(template_type, dest_file_name):
+    raw_config = open('{0}/config.json'.format(TEMPLATES_DIR), 'r').read()
+    config = json.loads(raw_config)
+
+    template_file_name = config.get(template_type, None)
+
+    if not template_file_name:
+        print('Template type does not exist in config')
+        print('Available template types:\n\t{0}').format(
+                '\n\t'.join([v for _, v in config.iteritems()])
+        )
+        sys.exit(2)
+
+    cp_command = 'cp {0}/{1} {2}'.format(
+        TEMPLATES_DIR, template_file_name, dest_file_name
+    )
+    subprocess.Popen(cp_command.split(' '))
+
+if __name__ == '__main__':
+    if len(sys.argv) != 3:
+        print('Proper use: {0} template-type dest-file').format(argv[0])
+        sys.exit(1)
+    
+    template_type = sys.argv[1]
+    dest_file_name = sys.argv[2]
+    create_template(template_type, dest_file_name)
